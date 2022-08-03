@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  bot:
+    container_name: "sayhrbot_dev"
+    build:
+      context: .
+#    restart: always
+    env_file:
+      - ".env.dev"
+    command: python app.py
+    volumes:
+      - .:/src
+    network_mode: "host"
