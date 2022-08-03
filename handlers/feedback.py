@@ -69,6 +69,7 @@ async def save_text_anon(message: types.Message, state: FSMContext):
                              callback_data=f'reply_for_feedback={message.from_user.id}')]])
     for manager in managers_chats:
         await bot.send_message(manager,
+                               f"#feedback\n"
                                f"<i>Аноним</i> написал ФИБДЕК:\n"
                                f"<code>{data['feedback']}</code>",
                                reply_markup=inline_keyboard)
@@ -85,6 +86,7 @@ async def save_text_anon(message: types.Message, state: FSMContext):
                              callback_data=f'reply_for_feedback={message.from_user.id}')]])
     for manager in managers_chats:
         await bot.send_message(manager,
+                               f"#feedback\n"
                                f"<i>{data['name']}</i> написал ФИБДЕК:\n"
                                f"<code>{data['feedback']}</code>",
                                reply_markup=inline_keyboard)

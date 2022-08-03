@@ -49,6 +49,7 @@ async def save_name(message: types.Message, state: FSMContext):
                              callback_data=f'reply_for_question={message.from_user.id}')]])
     for manager in managers_chats:
         await bot.send_message(manager,
+                               f"#question\n"
                                f"<i>{data['name']}</i> написал ВОПРОС:\n"
                                f"<code>{data['question']}</code>",
                                reply_markup=inline_keyboard)
