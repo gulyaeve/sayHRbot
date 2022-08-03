@@ -64,7 +64,7 @@ async def save_no_text(message: types.Message):
 @dp.callback_query_handler(Regexp('reply_for_question=([0-9]*)'))
 async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
     reply_user_id = callback.data.split("=")[1]
-    log(INFO, f"{callback.message.chat.id=} {reply_user_id=}")
+    log(INFO, f"В {callback.message.chat.id=} готовится ответ для {reply_user_id=}")
     async with state.proxy() as data:
         data["question_user_id"] = reply_user_id
         data["message_id"] = callback.message.message_id
@@ -74,9 +74,8 @@ async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
 
 @dp.message_handler(state="ANSWER_TO_QUESTION", content_types=types.ContentType.ANY)
 async def send_answer_to_text(message: types.Message, state: FSMContext):
-    log(INFO, f"{message.chat.id=} {message.from_id=} {message.message_id=}")
     data = await state.get_data()
-    log(INFO, f"{message.chat.id=} {data['question_user_id']=} {message.from_id=} {message.message_id=}")
+    log(INFO, f"Из {message.chat.id=} отправлен ответ {data['question_user_id']=}")
     await bot.copy_message(data['question_user_id'], message.chat.id, message.message_id)
     await bot.edit_message_reply_markup(message.chat.id, data['message_id'], reply_markup=None)
     await message.answer("Ответ отправлен")
