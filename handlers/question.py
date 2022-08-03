@@ -14,7 +14,6 @@ from loader import dp, bot
 class Question(StatesGroup):
     TextQuestion = State()
     Name = State()
-    # Send = State()
 
 
 @dp.message_handler(commands=['question'])
