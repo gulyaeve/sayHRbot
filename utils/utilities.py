@@ -3,7 +3,7 @@ from logging import log, INFO
 
 from aiogram import types
 
-from config import bot_admins
+from config import bot_admins, managers_chats
 from loader import bot
 
 
@@ -13,8 +13,10 @@ async def set_default_commands():
     """
     return await bot.set_my_commands([
         types.BotCommand(command="/start", description="Начать работу с чат-ботом"),
-        types.BotCommand(command="/say_thanks", description="Отправить благодарность коллеге"),
         types.BotCommand(command="/help", description="Помощь по командам чат-бота"),
+        types.BotCommand(command="/question", description="Задать вопрос"),
+        types.BotCommand(command="/feedback", description="Оставить обратную связь"),
+        types.BotCommand(command="/idea", description="Предложить идею"),
         types.BotCommand(command="/cancel", description="Отмена текущего действия"),
     ])
 
@@ -32,17 +34,12 @@ async def notify_admins(message):
             log(INFO, f"Admin [{bot_admin}] block this bot")
 
 
-# async def validate(date_text):
-#     try:
-#         datetime.strptime(date_text, '%Y-%m-%d')
-#         return 1
-#     except ValueError:
-#         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
-
-# def get_key(d: dict, value):
-#     for k, v in d.items():
-#         if v == value:
-#             return k
+# async def copy_to_managers(message):
+#     for manager in managers_chats:
+#         try:
+#             await bot.send_message(manager, message)
+#         except:
+#             log(INFO, f"Manager [{manager}] block this bot")
 
 
 def make_keyboard_dict(buttons: dict):

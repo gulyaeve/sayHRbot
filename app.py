@@ -1,4 +1,4 @@
-from loader import bot, storage, dp, db
+from loader import bot, storage, dp
 from utils.utilities import set_default_commands, notify_admins
 import filters, middlewares, handlers
 from aiogram import executor
@@ -13,7 +13,7 @@ async def on_shutdown(dp):
 
 async def on_startup(dp):
     await set_default_commands()
-    await db.create_tables()
+    # await db.create_tables()
     await notify_admins("Бот запущен и готов к работе.")
 
 

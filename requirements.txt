@@ -1,9 +1,2 @@
 environs==9.5.0
 aiogram>=2.21
-# asyncpg~=0.25.0
-# aiosmtplib>=1.1.6
-# matcensor>=1.0.3
-# dostoevsky
-# vobject
-# Pillow>=9.2.0
-# pyppeteer>=1.0.2
