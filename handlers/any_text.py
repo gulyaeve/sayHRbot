@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Regexp
 from aiogram.types import ContentType, InlineKeyboardMarkup, InlineKeyboardButton
 
-from config import bot_admins
+from config import bot_admins, managers_chats
 from loader import dp, bot
 
 
@@ -40,6 +40,16 @@ async def content_handler(message: types.Message):
                                    f" отправил: {message.content_type}", reply_markup=inline_keyboard)
         except:
             log(INFO, f"Failed to send to admin [{bot_admin}]")
+    for manager in managers_chats:
+        try:
+            if message.from_user.username is not None:
+                username = f"<b>@{message.from_user.username}</b>"
+            else:
+                username = "<b>Пользоватлель скрыл свой юзернейм</b>"
+            await bot.send_message(manager, f"#comment\n{username}\nНаписал сообщение не выбрав команду:")
+            await message.forward(manager)
+        except:
+            log(INFO, f"Failed to send to manager [{manager}]")
 
 
 @dp.callback_query_handler(Regexp('reply_from_anytext_id=([0-9]*)'))
