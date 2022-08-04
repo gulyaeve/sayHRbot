@@ -45,7 +45,7 @@ async def content_handler(message: types.Message):
             if message.from_user.username is not None:
                 username = f"<b>@{message.from_user.username}</b>"
             else:
-                username = "<b>Пользоватлель скрыл свой юзернейм</b>"
+                username = "<b>Пользователь скрыл свой юзернейм</b>"
             await bot.send_message(manager, f"#comment\n{username}\nНаписал сообщение не выбрав команду:")
             await message.forward(manager)
         except:
