@@ -27,7 +27,7 @@ async def idea_command(message: types.Message):
     ])
     await message.answer("Мы знаем, что в нашей команде много креативных и неравнодушных людей. "
                          "Напиши свою идею, а мы будем рады помочь воплотить интересные предложения в жизнь или "
-                         "переадресуем их тем, кто сделает это лучше нас.. "
+                         "переадресуем их тем, кто сделает это лучше нас.\n"
                          "Ты можешь сделать это анонимно или представиться (тогда у нас будет возможность обсудить с "
                          "тобой детали).",
                          reply_markup=keyboard)
@@ -83,7 +83,7 @@ async def save_text_anon(message: types.Message, state: FSMContext):
         data['idea'] = message.text
     await message.answer("Спасибо, что участвуешь в улучшении жизни организации!")
     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="Ответить на этe идею",
+        InlineKeyboardButton(text="Ответить на эту идею",
                              callback_data=f'reply_for_idea={message.from_user.id}')]])
     for manager in managers_chats:
         await bot.send_message(manager,
