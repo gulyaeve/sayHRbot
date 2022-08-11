@@ -108,7 +108,8 @@ async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
 async def send_answer_to_text(message: types.Message, state: FSMContext):
     data = await state.get_data()
     log(INFO, f"Из {message.chat.id=} отправлен ответ {data['feedback_user_id']=}")
-    await bot.copy_message(data['feedback_user_id'], message.chat.id, message.message_id)
+    # await bot.copy_message(data['feedback_user_id'], message.chat.id, message.message_id)
+    await bot.send_message(data['feedback_user_id'], f"Ответ от команды HR:\n\n<i>{message.text}</i>")
     await bot.edit_message_reply_markup(message.chat.id, data['message_id'], reply_markup=None)
     await message.answer("Ответ отправлен")
     log(INFO, f'Пользователю [{data["feedback_user_id"]=}] отправлено: {message.message_id}')

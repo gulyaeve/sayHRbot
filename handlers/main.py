@@ -12,12 +12,12 @@ from utils.utilities import get_bot_info
 async def help_command(message: types.Message):
     help_message = """
     <b>Команды чат-бота:</b>\n
-    <b>/start</b> - Начать работу с ботом;\n
-    <b>/help</b> - Помощь по командам чат-бота;\n
-    <b>/question</b> - Задать вопрос;\n
-    <b>/feedback</b> - Оставить обратную связь;\n
-    <b>/idea</b> - Предложить идею;\n
-    <b>/cancel</b> - отмена любого текущего действия;\n
+    <b>/start</b> - Начать работу с ботом\n
+    <b>/help</b> - Помощь по командам чат-бота\n
+    <b>/question</b> - Задать вопрос\n
+    <b>/feedback</b> - Оставить обратную связь\n
+    <b>/idea</b> - Предложить идею\n
+    <b>/cancel</b> - отмена любого текущего действия\n
     """
     await message.answer(help_message)
 
