@@ -13,31 +13,50 @@ from utils.utilities import make_keyboard_list
 
 
 class FeedBack(StatesGroup):
+    Text = State()
     Name = State()
     InputName = State()
-    TextAndAnon = State()
-    TextAndName = State()
+    # TextAndAnon = State()
+    # TextAndName = State()
 
 
 @dp.message_handler(commands=['feedback'])
 async def feedback_command(message: types.Message):
+    await message.answer("Нам важно, чтобы взаимодействие между сотрудниками в команде было легким, "
+                         "комфортным и интересным, поэтому просим рассказать, что тебя тревожит, "
+                         "и как мы можем помочь в данной ситуации. Ты можешь сделать это анонимно или представиться "
+                         "(тогда у нас будет возможность обсудить с тобой детали).\n"
+                         "Напиши, о чем хочешь нам сообщить:")
+    log(INFO, f"{message.from_user.id=} tap to feedback")
+    await FeedBack.Text.set()
+
+
+@dp.message_handler(content_types=types.ContentType.TEXT, state=FeedBack.Text)
+async def save_text_anon(message: types.Message, state: FSMContext):
     keyboard = make_keyboard_list([
         "Отправить анонимно",
         "Представиться"
     ])
-    await message.answer("Нам важно, чтобы взаимодействие между сотрудниками в команде было легким, "
-                         "комфортным и интересным, поэтому просим рассказать, что тебя тревожит, "
-                         "и как мы можем помочь в данной ситуации. Ты можешь сделать это анонимно или представиться "
-                         "(тогда у нас будет возможность обсудить с тобой детали).",
-                         reply_markup=keyboard)
-    log(INFO, f"{message.from_user.id=} tap to feedback")
+    async with state.proxy() as data:
+        data['feedback'] = message.text
+    await message.answer("Представишься или отправить анонимно?", reply_markup=keyboard)
     await FeedBack.Name.set()
 
 
 @dp.message_handler(Text(equals="Отправить анонимно"), content_types=types.ContentType.TEXT, state=FeedBack.Name)
 async def choose_name_anon(message: types.Message, state: FSMContext):
-    await message.answer("Напиши, о чем хочешь нам сообщить:", reply_markup=types.ReplyKeyboardRemove())
-    await FeedBack.TextAndAnon.set()
+    data = await state.get_data()
+    await message.answer("Спасибо, что делишься с нами обратной связью!")
+    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Ответить на этот фидбек",
+                             callback_data=f'reply_for_feedback={message.from_user.id}')]])
+    for manager in managers_chats:
+        await bot.send_message(manager,
+                               f"#feedback\n"
+                               f"<i>Аноним</i> написал ФИБДЕК:\n"
+                               f"<code>{data['feedback']}</code>",
+                               reply_markup=inline_keyboard)
+    await state.finish()
 
 
 @dp.message_handler(Text(equals="Представиться"), content_types=types.ContentType.TEXT, state=FeedBack.Name)
@@ -55,31 +74,7 @@ async def no_choose(message: types.Message):
 async def save_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
-    await message.answer("Напиши, о чем хочешь нам сообщить:")
-    await FeedBack.TextAndName.set()
-
-
-@dp.message_handler(content_types=types.ContentType.TEXT, state=FeedBack.TextAndAnon)
-async def save_text_anon(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['feedback'] = message.text
-    await message.answer("Спасибо, что делишься с нами обратной связью!")
-    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="Ответить на этот фидбек",
-                             callback_data=f'reply_for_feedback={message.from_user.id}')]])
-    for manager in managers_chats:
-        await bot.send_message(manager,
-                               f"#feedback\n"
-                               f"<i>Аноним</i> написал ФИБДЕК:\n"
-                               f"<code>{data['feedback']}</code>",
-                               reply_markup=inline_keyboard)
-    await state.finish()\
-
-
-@dp.message_handler(content_types=types.ContentType.TEXT, state=FeedBack.TextAndName)
-async def save_text_anon(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['feedback'] = message.text
+    # data = await state.get_data()
     await message.answer("Спасибо, что делишься с нами обратной связью!")
     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Ответить на этот фидбек",
@@ -91,6 +86,23 @@ async def save_text_anon(message: types.Message, state: FSMContext):
                                f"<code>{data['feedback']}</code>",
                                reply_markup=inline_keyboard)
     await state.finish()
+#
+#
+# @dp.message_handler(content_types=types.ContentType.TEXT, state=FeedBack.TextAndName)
+# async def save_text_anon(message: types.Message, state: FSMContext):
+#     async with state.proxy() as data:
+#         data['feedback'] = message.text
+#     await message.answer("Спасибо, что делишься с нами обратной связью!")
+#     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+#         InlineKeyboardButton(text="Ответить на этот фидбек",
+#                              callback_data=f'reply_for_feedback={message.from_user.id}')]])
+#     for manager in managers_chats:
+#         await bot.send_message(manager,
+#                                f"#feedback\n"
+#                                f"<i>{data['name']}</i> написал ФИБДЕК:\n"
+#                                f"<code>{data['feedback']}</code>",
+#                                reply_markup=inline_keyboard)
+#     await state.finish()
 
 
 @dp.callback_query_handler(Regexp('reply_for_feedback=([0-9]*)'))
