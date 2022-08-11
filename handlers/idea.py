@@ -70,7 +70,7 @@ async def save_text_anon(message: types.Message, state: FSMContext):
                              callback_data=f'reply_for_idea={message.from_user.id}')]])
     for manager in managers_chats:
         await bot.send_message(manager,
-                               f"#идея\n"
+                               f"#idea\n"
                                f"<i>Аноним</i> написал ИДЕЮ:\n"
                                f"<code>{data['idea']}</code>",
                                reply_markup=inline_keyboard)
