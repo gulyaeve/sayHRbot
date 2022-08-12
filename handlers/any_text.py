@@ -55,7 +55,7 @@ async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data["reply_user_id"] = reply_user_id
         data["message_id"] = callback.message.message_id
-    await callback.message.answer(f"Введите ответ (только текст):")
+    await callback.message.answer(f"Введите ответ:")
     await state.set_state("ANSWER_TO_ANY_TEXT")
 
 
