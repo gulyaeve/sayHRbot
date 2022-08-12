@@ -143,7 +143,7 @@ async def send_answer_to_text(message: types.Message, state: FSMContext):
     # await bot.copy_message(data['idea_user_id'], message.chat.id, message.message_id)
     await bot.send_message(data['idea_user_id'], f"Ответ от команды HR на твою идею:")
     await bot.copy_message(data['idea_user_id'], message.chat.id, message.message_id)
-    await bot.edit_message_reply_markup(message.chat.id, data['message_id'], reply_markup=None)
+    # await bot.edit_message_reply_markup(message.chat.id, data['message_id'], reply_markup=None)
     await message.answer("Ответ отправлен")
     log(INFO, f'Пользователю [{data["idea_user_id"]=}] отправлено: {message.message_id}')
     await state.finish()
