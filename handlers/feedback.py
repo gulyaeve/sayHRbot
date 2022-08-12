@@ -22,11 +22,12 @@ class FeedBack(StatesGroup):
 
 @dp.message_handler(commands=['feedback'])
 async def feedback_command(message: types.Message):
-    await message.answer("Нам важно, чтобы взаимодействие между сотрудниками в команде было легким, "
-                         "комфортным и интересным, поэтому просим рассказать, что тебя тревожит, "
-                         "и как мы можем помочь в данной ситуации. Ты можешь сделать это анонимно или представиться "
-                         "(тогда у нас будет возможность обсудить с тобой детали).\n"
-                         "Напиши, о чем хочешь нам сообщить:")
+    await message.answer("Нам важно, чтобы взаимодействие между сотрудниками в команде было легким, комфортным и "
+                         "интересным, поэтому просим рассказать, что тебя тревожит, "
+                         "и как мы можем помочь в данной ситуации.\n\n"
+                         "🥷<i>Ты можешь сделать это анонимно или представиться (тогда у нас будет возможность обсудить "
+                         "с тобой детали).</i>\n\n"
+                         "✍️<b>Напиши свою обратную связь:</b>")
     log(INFO, f"{message.from_user.id=} tap to feedback")
     await FeedBack.Text.set()
 
@@ -123,7 +124,8 @@ async def send_answer_to_text(message: types.Message, state: FSMContext):
     data = await state.get_data()
     log(INFO, f"Из {message.chat.id=} отправлен ответ {data['feedback_user_id']=}")
     # await bot.copy_message(data['feedback_user_id'], message.chat.id, message.message_id)
-    await bot.send_message(data['feedback_user_id'], f"Ответ от команды HR:\n\n<i>{message.text}</i>")
+    await bot.send_message(data['feedback_user_id'], f"Ответ от команды HR на твой фидбек:")
+    await bot.copy_message(data['feedback_user_id'], message.chat.id, message.message_id)
     await bot.edit_message_reply_markup(message.chat.id, data['message_id'], reply_markup=None)
     await message.answer("Ответ отправлен")
     log(INFO, f'Пользователю [{data["feedback_user_id"]=}] отправлено: {message.message_id}')

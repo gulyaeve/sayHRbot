@@ -13,10 +13,10 @@ async def set_default_commands():
     """
     return await bot.set_my_commands([
         types.BotCommand(command="/start", description="Начать работу с чат-ботом"),
-        types.BotCommand(command="/help", description="Помощь по командам чат-бота"),
         types.BotCommand(command="/question", description="Задать вопрос"),
         types.BotCommand(command="/feedback", description="Оставить обратную связь"),
         types.BotCommand(command="/idea", description="Предложить идею"),
+        types.BotCommand(command="/help", description="Помощь по командам чат-бота"),
         types.BotCommand(command="/cancel", description="Отмена текущего действия"),
     ])
 
