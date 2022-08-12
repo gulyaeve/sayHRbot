@@ -46,7 +46,8 @@ async def save_text_anon(message: types.Message, state: FSMContext):
 @dp.message_handler(Text(equals="Отправить анонимно"), content_types=types.ContentType.TEXT, state=FeedBack.Name)
 async def choose_name_anon(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    await message.answer("Спасибо, что делишься с нами обратной связью!")
+    await message.answer("Спасибо, что делишься с нами обратной связью!",
+                         reply_markup=types.ReplyKeyboardRemove())
     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Ответить на этот фидбек",
                              callback_data=f'reply_for_feedback={message.from_user.id}')]])
@@ -75,7 +76,8 @@ async def save_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
     # data = await state.get_data()
-    await message.answer("Спасибо, что делишься с нами обратной связью!")
+    await message.answer("Спасибо, что делишься с нами обратной связью!",
+                         reply_markup=types.ReplyKeyboardRemove())
     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Ответить на этот фидбек",
                              callback_data=f'reply_for_feedback={message.from_user.id}')]])
@@ -112,7 +114,7 @@ async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data["feedback_user_id"] = reply_user_id
         data["message_id"] = callback.message.message_id
-    await callback.message.answer(f"Введите ответ:")
+    await callback.message.answer(f"Введите ответ (только текст):")
     await state.set_state("ANSWER_TO_FEEDBACK")
 
 

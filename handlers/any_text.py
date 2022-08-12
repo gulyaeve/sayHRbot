@@ -42,12 +42,9 @@ async def content_handler(message: types.Message):
             log(INFO, f"Failed to send to admin [{bot_admin}]")
     for manager in managers_chats:
         try:
-            if message.from_user.username is not None:
-                username = f"<b>@{message.from_user.username}</b>"
-            else:
-                username = "<b>Пользователь скрыл свой юзернейм</b>"
-            await bot.send_message(manager, f"#comment\n{username}\nНаписал сообщение не выбрав команду:")
-            await message.forward(manager)
+            await bot.send_message(manager, f"#comment\nПользователь написал сообщение не выбрав команду:")
+            await bot.copy_message(manager, message.from_user.id, message.message_id, reply_markup=inline_keyboard)
+            # await message.forward(manager)
         except:
             log(INFO, f"Failed to send to manager [{manager}]")
 
@@ -57,13 +54,17 @@ async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
     reply_user_id = callback.data.split("=")[1]
     async with state.proxy() as data:
         data["reply_user_id"] = reply_user_id
-    await callback.message.answer(f"Введите ответ:")
+        data["message_id"] = callback.message.message_id
+    await callback.message.answer(f"Введите ответ (только текст):")
     await state.set_state("ANSWER_TO_ANY_TEXT")
 
 
 @dp.message_handler(state="ANSWER_TO_ANY_TEXT", content_types=types.ContentType.ANY)
 async def send_answer_to_text(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    await bot.copy_message(data['reply_user_id'], message.from_id, message.message_id)
+    # await bot.copy_message(data['reply_user_id'], message.chat.id, message.message_id)
+    await bot.send_message(data['reply_user_id'], f"Ответ от команды HR:\n\n<i>{message.text}</i>")
+    await bot.edit_message_reply_markup(message.chat.id, data['message_id'], reply_markup=None)
+    await message.answer("Ответ отправлен")
     log(INFO, f'Пользователю [{data["reply_user_id"]=}] отправлено: {message.message_id}')
     await state.finish()

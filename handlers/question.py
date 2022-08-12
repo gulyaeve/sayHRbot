@@ -9,27 +9,57 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from config import managers_chats
 from loader import dp, bot
+from utils.utilities import make_keyboard_list
 
 
 class Question(StatesGroup):
     TextQuestion = State()
     Name = State()
+    InputName = State()
 
 
 @dp.message_handler(commands=['question'])
 async def question_command(message: types.Message):
-    await message.answer("Напиши, что тебя интересует:")
+    await message.answer("Напиши свой вопрос:")
     log(INFO, f"{message.from_user.id=} tap to question")
     await Question.TextQuestion.set()
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT, state=Question.TextQuestion)
 async def save_text(message: types.Message, state: FSMContext):
+    keyboard = make_keyboard_list([
+        "Отправить анонимно",
+        "Представиться"
+    ])
     async with state.proxy() as data:
         data['question'] = message.text
-    await message.answer("Вопрос не может быть отправлен анонимно. "
-                         "Укажи ФИО, чтобы мы могли вернуться к тебе с ответом:")
+    await message.answer("Представишься или отправить анонимно?", reply_markup=keyboard)
     await Question.Name.set()
+
+
+@dp.message_handler(Text(equals="Отправить анонимно"), content_types=types.ContentType.TEXT, state=Question.Name)
+async def choose_name_anon(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    await message.answer("Спасибо за вопрос!\n"
+                         "Мы постараемся ответить тебе как можно быстрее! "
+                         "Но ответ может занять до 3-х рабочих дней, если потребуется уточнить детали.",
+                         reply_markup=types.ReplyKeyboardRemove())
+    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Ответить на этот вопрос",
+                             callback_data=f'reply_for_question={message.from_user.id}')]])
+    for manager in managers_chats:
+        await bot.send_message(manager,
+                               f"#idea\n"
+                               f"<i>Аноним</i> написал ВОПРОС:\n"
+                               f"<code>{data['question']}</code>",
+                               reply_markup=inline_keyboard)
+    await state.finish()
+
+
+@dp.message_handler(Text(equals="Представиться"), content_types=types.ContentType.TEXT, state=Question.Name)
+async def choose_name(message: types.Message, state: FSMContext):
+    await message.answer("Введи ФИО:", reply_markup=types.ReplyKeyboardRemove())
+    await Question.InputName.set()
 
 
 @dp.message_handler(content_types=types.ContentType.ANY, state=Question.TextQuestion)
@@ -37,13 +67,14 @@ async def save_no_text(message: types.Message):
     return await message.answer("Напиши свой вопрос текстом пожалуйста:")
 
 
-@dp.message_handler(content_types=types.ContentType.TEXT, state=Question.Name)
+@dp.message_handler(content_types=types.ContentType.TEXT, state=Question.InputName)
 async def save_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
     await message.answer("Спасибо за вопрос!\n"
                          "Мы постараемся ответить тебе как можно быстрее! "
-                         "Но ответ может занять до 3-х рабочих дней, если потребуется уточнить детали.")
+                         "Но ответ может занять до 3-х рабочих дней, если потребуется уточнить детали.",
+                         reply_markup=types.ReplyKeyboardRemove())
     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Ответить на этот вопрос",
                              callback_data=f'reply_for_question={message.from_user.id}')]])
@@ -68,7 +99,7 @@ async def answer_to_text(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data["question_user_id"] = reply_user_id
         data["message_id"] = callback.message.message_id
-    await callback.message.answer(f"Введите ответ:")
+    await callback.message.answer(f"Введите ответ (только текст):")
     await state.set_state("ANSWER_TO_QUESTION")
 
 
