@@ -3,12 +3,16 @@ import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from config import telegram_token
+from config import telegram_token, proxy_url
+
 # from utils.db_api.db import Database
 
 
 # ChatBot objects
-bot = Bot(token=telegram_token, parse_mode=types.ParseMode.HTML)
+if proxy_url:
+    bot = Bot(token=telegram_token, parse_mode=types.ParseMode.HTML, proxy=proxy_url)
+else:
+    bot = Bot(token=telegram_token, parse_mode=types.ParseMode.HTML)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
